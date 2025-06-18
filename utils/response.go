@@ -2,6 +2,7 @@ package utils
 
 import (
 	"net/http"
+	"user-api/tracing"
 
 	"github.com/gin-gonic/gin"
 )
@@ -12,6 +13,7 @@ type APIResponse struct {
 	Message string      `json:"message,omitempty"`
 	Data    interface{} `json:"data,omitempty"`
 	Error   string      `json:"error,omitempty"`
+	TraceID string      `json:"trace_id,omitempty"`
 }
 
 // SuccessResponse sends a successful response
@@ -20,6 +22,7 @@ func SuccessResponse(c *gin.Context, statusCode int, message string, data interf
 		Status:  "success",
 		Message: message,
 		Data:    data,
+		TraceID: tracing.GetTraceID(c.Request.Context()),
 	}
 	c.JSON(statusCode, response)
 }
@@ -29,6 +32,7 @@ func ErrorResponse(c *gin.Context, statusCode int, message string, err error) {
 	response := APIResponse{
 		Status:  "error",
 		Message: message,
+		TraceID: tracing.GetTraceID(c.Request.Context()),
 	}
 
 	if err != nil {
